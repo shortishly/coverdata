@@ -16,7 +16,7 @@
 
 PROJECT = coverdata
 PROJECT_DESCRIPTION = Erlang cover data to JSON
-PROJECT_VERSION = 0.1.0
+PROJECT_VERSION = ${shell git describe --tags}
 
 DEPS += jsx
 ESCRIPT_ZIP = zip
