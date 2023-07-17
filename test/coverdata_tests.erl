@@ -35,4 +35,6 @@ scan_test() ->
          scran_number_le => 0.0,
          scran_bits => 100.0,
          scran_character_complete => 98.667},
-       coverdata:report("module")).
+       coverdata:report(
+         #{"level" => module,
+           "precision" => 5})).

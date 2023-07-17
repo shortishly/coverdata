@@ -16,33 +16,70 @@
 -module(coverdata).
 
 
--export([import/0]).
 -export([main/1]).
 -export([report/1]).
 
 
 main(Args) ->
-    ?FUNCTION_NAME(Args, #{"format" => "json", "level" => "module" }).
+    ?FUNCTION_NAME(
+       Args,
+       #{"format" => "json",
+         "precision" => "5",
+         "level" => "module" }).
 
 main([[$-, $- | Key], Value | Args], A) ->
     ?FUNCTION_NAME(Args, A#{Key => Value});
 
-main([],
-     #{"input" := Input,
-       "output" := Output,
-       "level" := Level,
-       "format" := Format}) ->
+main([], Arg) ->
+    process(
+      maps:map(
+        fun
+            ("precision", Precision) ->
+                list_to_integer(Precision);
+
+            ("level", Level) ->
+                list_to_atom(Level);
+
+            (_, Value) ->
+                Value
+        end,
+        Arg)).
+
+
+process(#{"input" := Input, "output" := Output} = Arg) ->
     ok = cover:import(Input),
-    ok = file:write_file(
-           Output,
-           report(Format, Level)).
+    ok = file:write_file(Output, format_report(Arg));
+
+process(#{"output" := Output} = Arg) ->
+
+    {ok, CWD} = file:get_cwd(),
+
+    true = lists:all(
+             fun
+                 (Result) ->
+                     Result == ok
+             end,
+             [cover:import(CoverData)
+              || CoverData
+                     <- lists:map(
+                          fun
+                              (Relative) ->
+                                  filename:join(CWD, Relative)
+                          end,
+                          filelib:wildcard("**/*.coverdata"))
+                     -- cover:imported()]),
+
+    ok = file:write_file(Output, format_report(Arg)).
 
 
-report("json", Level) ->
-    jsx:encode(report(Level)).
+-spec format_report(#{}) -> iodata().
 
-report("module" = Level) ->
-    {result, Analysed, _} = cover:analyse(list_to_atom(Level)),
+format_report(#{"format" := "json"} = Arg) ->
+    jsx:encode(report(Arg)).
+
+
+report(#{"level" := module = Level, "precision" := Precision}) ->
+    {result, Analysed, _} = cover:analyse(Level),
     {Report, Total} = lists:foldl(
                         fun
                             ({_, {0, 0}}, A) ->
@@ -50,22 +87,27 @@ report("module" = Level) ->
 
                             ({Module, {Cov, NotCov} = Counts},
                              {A, {TotalCov, TotalNotCov}}) ->
-                                {A#{Module => percentage(Counts)},
+                                {A#{Module => percentage(Counts, Precision)},
                                  {Cov + TotalCov, NotCov + TotalNotCov}}
                         end,
                         {#{}, {0, 0}},
                         Analysed),
-    Report#{total => percentage(Total)}.
+    Report#{total => percentage(Total, Precision)}.
 
 
-percentage({Cov, NotCov}) ->
-    precision(Cov * 100 / (Cov + NotCov), 5).
+-spec percentage({non_neg_integer(), non_neg_integer()}, non_neg_integer()) -> float().
 
+percentage({Cov, NotCov}, Precision) ->
+    precision(Cov * 100 / (Cov + NotCov), Precision).
+
+
+-spec precision(float(), non_neg_integer()) -> float().
 
 precision(Value, Digits) ->
     Decimals = float_to_binary(
                  Value,
-                 [{decimals, Digits - trunc(math:ceil(math:log10(trunc(abs(Value)) + 1)))}]),
+                 [{decimals, decimals(Value, Digits)}]),
+
     case binary:split(Decimals, <<".">>) of
         [_, _] ->
             binary_to_float(Decimals);
@@ -75,13 +117,7 @@ precision(Value, Digits) ->
     end.
 
 
-import() ->
-    {ok, CWD} = file:get_cwd(),
-    [cover:import(CoverData)
-     || CoverData
-            <- lists:map(
-                 fun
-                     (Relative) ->
-                         filename:join(CWD, Relative)
-                 end,
-                 filelib:wildcard("**/*.coverdata")) -- cover:imported()].
+-spec decimals(float(), non_neg_integer()) -> integer().
+
+decimals(Value, Digits) ->
+    Digits - trunc(math:ceil(math:log10(trunc(abs(Value)) + 1))).
