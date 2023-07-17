@@ -23,6 +23,7 @@ ESCRIPT_ZIP = zip
 
 PLT_APPS += compiler
 PLT_APPS += crypto
+PLT_APPS += mnesia
 PLT_APPS += runtime_tools
 PLT_APPS += stdlib
 PLT_APPS += tools

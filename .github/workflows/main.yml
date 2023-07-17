@@ -33,6 +33,7 @@ jobs:
           otp-version: ${{matrix.otp}}
       - run: make escript
       - run: ./coverdata --input test/scran.coverdata.0 --output _site/scran.json
+      - run: cp coverdata _site
       - uses: actions/upload-pages-artifact@v1
         with:
           path: _site
