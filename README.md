@@ -23,19 +23,44 @@ This repository creates an [escript][erlang-org-escript] that reads
 coverage data from `.coverdata` files, outputting a JSON object of
 the percentage coverage per module and the total coverage percentage.
 
+Without an `--input` argument `coverdata` will import all `.coverdata`
+files under the current directory.
+
 ```shell
 bin/coverdata --output _site/cover/coverage.json --precision 3
+```
+
+Each module has a coverage rate, with `total` being combined rate: 
+
+```json
+{
+  "total": 67.6,
+  "scran_combinator": 96.2,
+  "scran_debug": 0,
+  "scran_number_be": 5.88,
+  "scran_number": 23.9,
+  "scran_multi": 97.2,
+  "scran_bytes": 83.3,
+  "scran_branch": 100,
+  "scran_sequence": 95.6,
+  "scran_result": 33.3,
+  "scran_number_le": 0,
+  "scran_bits": 100,
+  "scran_character_complete": 98.7
+}
 ```
 
 Options:
 
 - `--input` is a single filename of `.coverdata` to load (optional)
 - `--output` is an output filename for the JSON object (required)
-- `--level LEVEL` is the [analyse][erlang-org-cover-analyse-1] for
+- `--level LEVEL` is the [analyse][erlang-org-cover-analyse-1] level for
   [cover][erlang-org-cover] to use. Only `module` is supported at
   present, and is the default (optional)
 - `--precision Precision` is the digits to use for the percentage, 5
   is the default (optional)
+- `--format FORMAT` is the output format to use, currently only `json`
+  is supported (default, optional).
   
 `coverdata` can be used in a GitHub Action copying the JSON object
 into a GitHub Pages environment as part of the build process, which
