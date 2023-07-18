@@ -5,19 +5,19 @@
     <img alt="Apache-2.0" src="https://img.shields.io/github/license/shortishly/scran?style=flat-square">
 </p>
 
-## What?
+## Why?
 
 `coverdata` easily converts [Erlang][erlang-org] [cover
 data][erlang-org-cover] files into a JSON object for simple
 integration with a [Shields IO Dynamic JSON
 badge][shields-io-dynamic-json-badge] to show a code coverage level
-updated with each build.
+updated with each build:
 
 <p align="center">
   <img alt="Dynamic JSON Badge" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fshortishly.github.io%2Fcoverdata%2Fscran.json&query=%24.total&suffix=%25&label=coverage">
 </p>
 
-## Why?
+## What?
 
 This repository creates an [escript][erlang-org-escript] that reads
 coverage data from `.coverdata` files, outputting a JSON object of
