@@ -34,4 +34,6 @@ SHELL_OPTS += +pc unicode
 SHELL_OPTS += -s sync
 
 
-include erlang.mk
+include $(if $(ERLANG_MK_FILENAME),$(ERLANG_MK_FILENAME),erlang.mk)
+
+app:: escript
