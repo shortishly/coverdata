@@ -1,4 +1,4 @@
-#!/usr/bin/env escript -c
+#!/usr/bin/env escript
 %% -*- erlang -*-
 %% Copyright (c) 2023 Peter Morgan <peter.james.morgan@gmail.com>
 %%
@@ -17,6 +17,9 @@
 
 
 -module(cover2json).
+
+
+-mode(compile).
 
 
 main(Args) ->
