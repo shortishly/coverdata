@@ -1,0 +1,28 @@
+---
+name: BEAM Coverdata to JSON
+description: Easily convert BEAM coverdata into a JSON object
+branding:
+  icon: 'download-cloud'
+  color: 'gray-dark'
+inputs:
+  input:
+    description: Input coverdata location
+    default: _site/cover
+  otp-version:
+    description: OTP Version
+    default: 26
+  output:
+    description: coverage JSON filename
+    default: _site/cover/coverage.json
+runs:
+  using: composite
+  steps:
+    - uses: erlef/setup-beam@v1
+      with:
+        otp-version: ${{inputs.otp-version}}
+    - run: |
+        make -C $GITHUB_ACTION_PATH escript
+      shell: bash
+    - run: |
+        $GITHUB_ACTION_PATH/coverdata --input ${{inputs.input}} --output ${{inputs.output}}
+      shell: bash

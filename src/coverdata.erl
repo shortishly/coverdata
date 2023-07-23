@@ -24,6 +24,10 @@ main(Args) ->
     ?FUNCTION_NAME(
        Args,
        #{"format" => "json",
+         "input" => begin
+                        {ok, CWD} = file:get_cwd(),
+                        CWD
+                    end,
          "precision" => "5",
          "level" => "module" }).
 
@@ -47,13 +51,16 @@ main([], Arg) ->
 
 
 process(#{"input" := Input, "output" := Output} = Arg) ->
-    ok = cover:import(Input),
-    ok = file:write_file(Output, format_report(Arg));
+    case filelib:is_dir(Input) of
+        true ->
+            ok = import_dir(Input);
+        false ->
+            ok = cover:import(Input)
+    end,
+    ok = file:write_file(Output, format_report(Arg)).
 
-process(#{"output" := Output} = Arg) ->
 
-    {ok, CWD} = file:get_cwd(),
-
+import_dir(Directory) ->
     true = lists:all(
              fun
                  (Result) ->
@@ -61,15 +68,11 @@ process(#{"output" := Output} = Arg) ->
              end,
              [cover:import(CoverData)
               || CoverData
-                     <- lists:map(
-                          fun
-                              (Relative) ->
-                                  filename:join(CWD, Relative)
-                          end,
-                          filelib:wildcard("**/*.coverdata"))
-                     -- cover:imported()]),
-
-    ok = file:write_file(Output, format_report(Arg)).
+                     <- filelib:wildcard(
+                          filename:join(
+                            Directory,
+                            "**/*.coverdata"))]),
+    ok.
 
 
 -spec format_report(#{}) -> iodata().
