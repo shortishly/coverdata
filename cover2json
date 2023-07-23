@@ -1,0 +1,39 @@
+#!/usr/bin/env escript -c
+%% -*- erlang -*-
+%% Copyright (c) 2023 Peter Morgan <peter.james.morgan@gmail.com>
+%%
+%% Licensed under the Apache License, Version 2.0 (the "License");
+%% you may not use this file except in compliance with the License.
+%% You may obtain a copy of the License at
+%%
+%% http://www.apache.org/licenses/LICENSE-2.0
+%%
+%% Unless required by applicable law or agreed to in writing, software
+%% distributed under the License is distributed on an "AS IS" BASIS,
+%% WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+%% See the License for the specific language governing permissions and
+%% limitations under the License.
+%%
+
+
+-module(cover2json).
+
+
+main(Args) ->
+    RootDir = escript_directory(),
+    true = code:add_path(filename:join(RootDir, "ebin")),
+    lists:foreach(
+      fun
+          (Dependency) ->
+              true = code:add_path(
+                       filename:join([RootDir, "deps", Dependency, "ebin"]))
+      end,
+      begin
+           {ok, Dependencies} = file:list_dir(filename:join(RootDir, "deps")),
+           Dependencies
+      end),
+    coverdata:main(Args).
+
+escript_directory() ->
+    Components = filename:split(escript:script_name()),
+    filename:join(lists:sublist(Components, length(Components) - 1)).
