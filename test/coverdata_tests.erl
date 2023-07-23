@@ -22,19 +22,17 @@
 scan_test() ->
     cover:import("test/scran.coverdata.0"),
     ?assertEqual(
-       #{total => 67.647,
-         scran_combinator => 96.154,
-         scran_debug => 0.0,
-         scran_number_be => 5.8824,
-         scran_number => 23.913,
-         scran_multi => 97.222,
-         scran_bytes => 83.333,
-         scran_branch => 100.0,
-         scran_sequence => 95.588,
-         scran_result => 33.333,
-         scran_number_le => 0.0,
-         scran_bits => 100.0,
-         scran_character_complete => 98.667},
-       coverdata:report(
-         #{"level" => module,
-           "precision" => 5})).
+       #{total => 68,
+         scran_combinator => 96,
+         scran_debug => 0,
+         scran_number_be => 6,
+         scran_number => 24,
+         scran_multi => 97,
+         scran_bytes => 83,
+         scran_branch => 100,
+         scran_sequence => 96,
+         scran_result => 33,
+         scran_number_le => 0,
+         scran_bits => 100,
+         scran_character_complete => 99},
+       coverdata:report(#{"level" => module})).

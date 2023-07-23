@@ -35,5 +35,3 @@ SHELL_OPTS += -s sync
 
 
 include $(if $(ERLANG_MK_FILENAME),$(ERLANG_MK_FILENAME),erlang.mk)
-
-app:: escript
