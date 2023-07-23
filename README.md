@@ -23,30 +23,30 @@ This repository creates an [escript][erlang-org-escript] that reads
 coverage data from `.coverdata` files, outputting a JSON object of
 the percentage coverage per module and the total coverage percentage.
 
-Without an `--input` argument `coverdata` will import all `.coverdata`
+Without an `--input` argument `cover2json` will import all `.coverdata`
 files under the current directory.
 
 ```shell
-bin/coverdata --output _site/cover/coverage.json --precision 3
+cover2json --output _site/cover/coverage.json
 ```
 
 Each module has a coverage rate, with `total` being combined rate: 
 
 ```json
 {
-  "total": 67.6,
-  "scran_combinator": 96.2,
+  "total": 67,
+  "scran_combinator": 96,
   "scran_debug": 0,
-  "scran_number_be": 5.88,
-  "scran_number": 23.9,
-  "scran_multi": 97.2,
-  "scran_bytes": 83.3,
+  "scran_number_be": 5,
+  "scran_number": 23,
+  "scran_multi": 97,
+  "scran_bytes": 83,
   "scran_branch": 100,
-  "scran_sequence": 95.6,
-  "scran_result": 33.3,
+  "scran_sequence": 95,
+  "scran_result": 33,
   "scran_number_le": 0,
   "scran_bits": 100,
-  "scran_character_complete": 98.7
+  "scran_character_complete": 98
 }
 ```
 
@@ -57,15 +57,13 @@ Options:
 - `--level LEVEL` is the [analyse][erlang-org-cover-analyse-1] level for
   [cover][erlang-org-cover] to use. Only `module` is supported at
   present, and is the default (optional)
-- `--precision Precision` is the digits to use for the percentage, 5
-  is the default (optional)
 - `--format FORMAT` is the output format to use, currently only `json`
   is supported (default, optional).
   
-`coverdata` can be used in a GitHub Action copying the JSON object
-into a GitHub Pages environment as part of the build process, which
-can then be used for the coverage badge of the project using [a
-shields.io dynamic JSON badge][shields-io-dynamic-json-badge].
+`coverdata` can be used as part of a GitHub Action copying the JSON
+object into a GitHub Pages environment. [A shields.io dynamic JSON
+badge][shields-io-dynamic-json-badge] can then use the `coverage.json`
+as input.
 
 In this [GitHub Action fragment][shortishly-scran-main-yml]:
 
@@ -83,7 +81,11 @@ In this [GitHub Action fragment][shortishly-scran-main-yml]:
         with:
           otp-version: ${{matrix.otp}}
       - run: make tests edoc
-      - run: bin/coverdata --input _site/cover/eunit.coverdata --output _site/cover/coverage.json --precision 3
+      - uses: shortishly/coverdata@main
+        with:
+          input: _site/cover
+          output: _site/cover/coverage.json
+          otp-version: ${{matrix.otp}}
       - uses: actions/upload-pages-artifact@v1
         with:
           path: _site
@@ -118,10 +120,10 @@ coverage of the project within the badge.
 
 `coverdata` uses [erlang.mk][erlang-mk].
 
-To generate the `escript`:
+To fetch dependencies and compile:
 
 ```shell
-make escript
+make app
 ```
 
 To run the unit tests:
